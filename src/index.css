@@ -1,0 +1,499 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --light: hsl(50, 30%, 90%);
+  --dark: hsl(90, 30%, 30%);
+  --green: #929b48;
+  --shadow:
+    3px 3px 9px -3px black, inset -3px -3px 2px 0px rgba(0, 0, 0, 0.5),
+    inset 1px 1px 2px 0px rgba(255, 255, 255, 0.5);
+}
+
+body {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--light);
+  font-family: "DynaPuff", cursive;
+  font-size: 1.25rem;
+  /* padding: 40px; */
+  min-height: 100vh;
+  background:
+    url("/src/img/backface.png"),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.2), 80%, rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(10px);
+  background-blend-mode: multiply;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#root {
+  padding: 20px;
+  /* min-height: 100vh; */
+  min-width: 344px;
+  width: 100%;
+  max-width: 850px;
+  display: flex;
+  justify-content: space-between;
+  /* flex-direction: column; */
+  /* justify-content: center; */
+  /* align-items: center; */
+  gap: 20px;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+
+.board {
+  perspective: 600px;
+  display: grid;
+  /* grid-template-columns: repeat(4, auto); */
+  grid-template-columns: repeat(4, minmax(50px, 100px));
+  gap: 20px;
+  transition: 0.2s;
+}
+
+.faded {
+  opacity: 0.66;
+}
+
+.tile {
+  cursor: pointer;
+  /* width: 100px;
+  height: 100px; */
+  height: 100%;
+  aspect-ratio: 1;
+  /* position: relative; */
+  transform-style: preserve-3d;
+  transition: 0.2s;
+  border-radius: 50%;
+  background-image: url("/src/img/backface.png");
+  /* random positioning will be applied via js */
+  transform: translate(var(--translate-x, 0px), var(--translate-y, 0px))
+    rotate(var(--rotate, 0deg));
+}
+
+.locked .tile {
+  pointer-events: none;
+  /* to switch back without moving cursor */
+  cursor: initial;
+}
+
+.tile:hover {
+  transform: translate(var(--translate-x, 0px), var(--translate-y, 0px))
+    rotate(var(--rotate, 0deg)) scale(1.03);
+}
+
+.tile:active {
+  transform: translate(var(--translate-x, 0px), var(--translate-y, 0px))
+    rotate(var(--rotate, 0deg)) scale(0.97);
+}
+
+.tile.flipped {
+  cursor: initial;
+  transform: translate(var(--translate-x, 0px), var(--translate-y, 0px))
+    rotate(var(--rotate, 0deg)) rotateY(180deg);
+  /* temp */
+  /* opacity: 0.5; */
+}
+
+/* for shadows: */
+.tile:after,
+.landed-dice:after,
+.garden::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  content: "";
+}
+
+.tile:after {
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+}
+
+.tile.flipped:after {
+  transform: rotateY(180deg);
+}
+
+.front-face {
+  width: 100%;
+  height: 100%;
+  /* position: absolute; */
+  border-radius: 50%;
+  transform: rotateY(180deg);
+  /* temp off*/
+  backface-visibility: hidden;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.dice-container {
+  display: flex;
+  gap: 20px;
+}
+
+.landed-dice {
+  position: relative;
+  height: 75px;
+  width: 75px;
+  background-image: url("/src/img/dice-blank.png");
+  background-size: cover;
+  cursor: initial;
+  border-radius: 15px;
+  /* overflow: hidden; */
+  /* transition: 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); */
+  transition: 0.5s
+    linear(
+      0 0%,
+      0 2.27%,
+      0.02 4.53%,
+      0.04 6.8%,
+      0.06 9.07%,
+      0.1 11.33%,
+      0.14 13.6%,
+      0.25 18.15%,
+      0.39 22.7%,
+      0.56 27.25%,
+      0.77 31.8%,
+      1 36.35%,
+      0.89 40.9%,
+      0.85 43.18%,
+      0.81 45.45%,
+      0.79 47.72%,
+      0.77 50%,
+      0.75 52.27%,
+      0.75 54.55%,
+      0.75 56.82%,
+      0.77 59.1%,
+      0.79 61.38%,
+      0.81 63.65%,
+      0.85 65.93%,
+      0.89 68.2%,
+      1 72.7%,
+      0.97 74.98%,
+      0.95 77.25%,
+      0.94 79.53%,
+      0.94 81.8%,
+      0.94 84.08%,
+      0.95 86.35%,
+      0.97 88.63%,
+      1 90.9%,
+      0.99 93.18%,
+      0.98 95.45%,
+      0.99 97.73%,
+      1 100%
+    );
+}
+
+.landed-dice-transform {
+  transform: rotate(360deg);
+}
+
+.landed-dice:after {
+  border-radius: 15px;
+  box-shadow:
+    8px 8px 16px -8px black,
+    inset 8px 8px 6px 0px rgba(255, 255, 255, 0.75),
+    inset -8px -8px 6px 0px rgba(0, 0, 0, 0.5);
+}
+
+.landed-dice img {
+  height: 100%;
+  width: 100%;
+  border-radius: 15px;
+}
+
+.color {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color div {
+  height: 55%;
+  width: 55%;
+  border-radius: 50%;
+  transition: 0.2s ease-in;
+}
+
+.color .red {
+  background-color: #82242b;
+}
+
+.color .green {
+  background-color: var(--green);
+}
+
+.color .yellow {
+  background-color: #dcb65b;
+}
+
+.color .violet {
+  background-color: #513967;
+}
+
+.garden {
+  height: 460px;
+  width: 287px;
+  border-radius: 15px;
+  position: relative;
+  background-image: url("/src/img/garden.png");
+  background-size: cover;
+}
+
+.garden:after {
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+}
+
+.crow {
+  position: absolute;
+  width: 100px;
+  transition: 0.5s ease-in-out;
+  filter: drop-shadow(8px 8px 4px rgba(0, 0, 0, 0.5));
+}
+
+.crow-flipped {
+  transform: rotateY(180deg);
+}
+
+.crow-8 {
+  left: 10px;
+  bottom: 35px;
+}
+
+.crow-7 {
+  left: 13px;
+  bottom: 120px;
+}
+
+.crow-6 {
+  left: 0px;
+  bottom: 190px;
+}
+
+.crow-5 {
+  left: 14px;
+  bottom: 265px;
+}
+
+.crow-4 {
+  left: 47px;
+  bottom: 325px;
+}
+
+.crow-3 {
+  left: 122px;
+  bottom: 350px;
+}
+
+.crow-2 {
+  left: 155px;
+  bottom: 290px;
+}
+
+.crow-1 {
+  left: 160px;
+  bottom: 220px;
+}
+
+.crow-0 {
+  left: 185px;
+  bottom: 150px;
+}
+
+button {
+  color: var(--dark);
+  background-color: var(--light);
+  border: none;
+  font-family: inherit;
+  padding: 0.5rem 2rem;
+  border-radius: 50px;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.basket-fruit,
+button {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.basket-fruit:hover,
+button:hover {
+  transform: scale(1.03);
+}
+
+.basket-fruit:active,
+button:active {
+  transform: scale(0.97);
+}
+
+.leaderboard-section {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+}
+
+.leaderboard {
+  background-color: var(--light);
+  color: var(--green);
+  box-shadow: var(--shadow);
+  max-height: 90vh;
+  padding: 40px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  /* position: relative; */
+}
+
+h1 {
+  color: var(--dark);
+}
+
+.ranks {
+  width: 100%;
+  /* max-width: 250px; */
+  /* max-height: 15rem; */
+  overflow: auto;
+  background-color: white;
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.rank {
+  display: flex;
+  justify-content: space-between;
+  /* for head */
+  width: 100%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+input {
+  /* background: none; */
+  padding: 0.5rem;
+  border-radius: 15px;
+  font-size: inherit;
+  font-family: inherit;
+  border: none;
+  text-align: center;
+  color: var(--dark);
+}
+
+.leaderboard button {
+  /* color: var(--light); */
+  color: white;
+  background-color: var(--dark);
+}
+
+@media (max-width: 810px) {
+  body {
+    /* height: initial; */
+    font-size: 1rem;
+    /* margin: 20px; */
+    text-align: center;
+    /* no gradient if height issue not fixed */
+    background:
+      url("/src/img/backface.png"),
+      linear-gradient(135deg, rgba(0, 0, 0, 0.3), 80%, rgba(0, 0, 0, 0.3));
+  }
+
+  #root {
+    flex-direction: column;
+    justify-content: flex-start;
+    /* gap: 20px; */
+    width: 100%;
+    /* height: 100vh; */
+    /* padding: 20px; */
+  }
+
+  section {
+    gap: 20px;
+  }
+
+  .garden-section {
+    order: 2;
+  }
+
+  .board {
+    width: 100%;
+    max-width: 460px;
+    gap: 15px;
+    order: 2;
+  }
+
+  .tile {
+    /* width: 75px; */
+    /* height: 75px; */
+    /* width: 100%; */
+    /* why */
+    /* height: 95%; */
+
+    /* height: 0px;
+    padding-bottom: 100%; */
+    /* height: auto; */
+  }
+
+  .dice-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .landed-dice {
+    width: 50px;
+    height: 50px;
+  }
+
+  .garden {
+    transform: translateY(-115px) rotate(-90deg) scale(75%);
+    margin-bottom: -230px;
+  }
+
+  .garden:after {
+    transform: rotateY(180deg);
+  }
+
+  .crow {
+    transform: rotate(90deg);
+  }
+
+  /* button { */
+  /* transform: translateY(-230px); */
+  /* position: fixed; */
+  /* bottom: 40px; */
+  /* } */
+}
